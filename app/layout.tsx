@@ -2,6 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Mulish } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
+import ModalProvider from "@/providers/modal-provider";
 
 const mulish = Mulish({ subsets: ["latin"] });
 
@@ -26,7 +28,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={mulish.className}>{children}</body>
+        <body className={mulish.className}>
+          <ModalProvider />
+          <main>{children}</main>
+          <Toaster />
+        </body>
       </html>
     </ClerkProvider>
   );
