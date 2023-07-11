@@ -5,7 +5,14 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
     try {
-        const wardrobes = await prisma.wardrobe.findMany({});
+        const wardrobes = await prisma.wardrobe.findMany({
+            take: 16,
+            orderBy: {
+                name: "asc",
+            },
+            skip: 0,
+            
+        });
         return NextResponse.json(wardrobes);
     } catch (error) {
         console.log("GET ALL WARDROBES ERROR: ", error);

@@ -1,23 +1,174 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
-
 model Wardrobe {
-  id String @id @default(uuid())
-  name String
+  id          String   @id @default(uuid())
+  name        String
   description String?
-  userId String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items      Item[]     @relation("WardrobeItems")
+  categories Category[] @relation("WardrobeCategories")
+  orders     Order[]    @relation("WardrobeOrders")
+}
+
+model Item {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  brand       String
+  sizeId      String
+  pattern     String
+  color       String
+  categoryId  String
+  isFeatured  Boolean @default(false)
+  isArchived  Boolean @default(false)
+  forSale     Boolean @default(false)
+
+  wardrobeId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  images    Image[]
+  wardrobe  Wardrobe    @relation("WardrobeItems", fields: [wardrobeId], references: [id], onDelete: Cascade)
+  size      Size        @relation("ItemSize", fields: [sizeId], references: [id], onDelete: Cascade)
+  category  Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  outfits   Outfit[]    @relation("OutfitItems")
+  favorites Favorite[]  @relation("FavoriteItems")
+  sales     Sale[]
+  orders    OrderItem[]
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  itemId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Size {
+  id        String   @id @default(uuid())
+  name      String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items Item[] @relation("ItemSize")
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     Item[]
+
+  wardrobeId String
+  wardrobe   Wardrobe @relation("WardrobeCategories", fields: [wardrobeId], references: [id])
+}
+
+model Outfit {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  season      String
+  
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items     Item[]     @relation("OutfitItems")
+  favorites Favorite[] @relation("FavoriteOutfits")
+  likes     Like[]
+  comments  Comment[]
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  itemId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  outfitId  String
+
+  item   Item   @relation("FavoriteItems", fields: [itemId], references: [id], onDelete: Cascade)
+  outfit Outfit @relation("FavoriteOutfits", fields: [outfitId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  outfitId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outfit Outfit @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  outfitId  String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outfit Outfit @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+}
+
+model Sale {
+  id        String   @id @default(uuid())
+  userId    String
+  itemId    String
+  price     Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  item Item @relation(fields: [itemId], references: [id])
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  wardrobeId String
+  wardrobe   Wardrobe    @relation("WardrobeOrders", fields: [wardrobeId], references: [id])
+  isPaid     Boolean     @default(false)
+  phone      String      @default("")
+  address    String      @default("")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Coupon {
+  id        String   @id @default(uuid())
+  code      String
+  discount  Decimal
+  validFrom DateTime
+  validTo   DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

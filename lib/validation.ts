@@ -6,3 +6,7 @@ export const wardrobeSchema =z.object({
         message: "Description must be less than 1000 characters long"
     }),
 });
+
+export const categorySchema = z.object({
+    name: z.string().min(1, {message: "Name must be at least 1 character long"}),
+});
