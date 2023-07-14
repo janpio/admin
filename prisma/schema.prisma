@@ -19,7 +19,6 @@ model Wardrobe {
 
   items      Item[]     @relation("WardrobeItems")
   categories Category[] @relation("WardrobeCategories")
-  orders     Order[]    @relation("WardrobeOrders")
 }
 
 model Item {
@@ -33,7 +32,6 @@ model Item {
   isFeatured  Boolean @default(false)
   isArchived  Boolean @default(false)
   isFavorite  Boolean @default(false)
-  forSale     Boolean @default(false)
   size        String
   wardrobeId String
   createdAt  DateTime @default(now())
@@ -44,8 +42,6 @@ model Item {
   category  Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   outfits   Outfit[]    @relation("OutfitItems")
   favorites Favorite[]  @relation("FavoriteItems")
-  sales     Sale[]
-  orders    OrderItem[]
 }
 
 model Image {
@@ -120,45 +116,6 @@ model Comment {
   outfit Outfit @relation(fields: [outfitId], references: [id], onDelete: Cascade)
 }
 
-model Sale {
-  id        String   @id @default(uuid())
-  userId    String
-  itemId    String
-  price     Decimal
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  item Item @relation(fields: [itemId], references: [id])
-}
 
-model Order {
-  id         String      @id @default(uuid())
-  wardrobeId String
-  wardrobe   Wardrobe    @relation("WardrobeOrders", fields: [wardrobeId], references: [id])
-  isPaid     Boolean     @default(false)
-  phone      String      @default("")
-  address    String      @default("")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  orderItems OrderItem[]
-}
 
-model OrderItem {
-  id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  itemId    String
-  item      Item     @relation(fields: [itemId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Coupon {
-  id        String   @id @default(uuid())
-  code      String
-  discount  Decimal
-  validFrom DateTime
-  validTo   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}

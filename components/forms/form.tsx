@@ -43,7 +43,6 @@ interface FormProps {
 const CreateForm: React.FC<FormProps> = ({
   onSubmit,
   categories,
-  wardrobe,
   onDelete,
   buttonText,
   link,
@@ -208,38 +207,7 @@ const CreateForm: React.FC<FormProps> = ({
               </FormItem>
             )}
           />
-          <FormField
-            name="wardrobeId"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem>
-                <FormLabel>Wardrobe</FormLabel>
-                <Select
-                  disabled={formState.isSubmitting}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder="Select a category"
-                        defaultValue={field.value}
-                      />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {wardrobe.map(w => (
-                      <SelectItem key={w.id} value={w.id}>
-                        {w.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          
           <FormField
             name="pattern"
             control={form.control}

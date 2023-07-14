@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { itemSchema } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
-import { Category, Image, Item, Wardrobe } from "@prisma/client";
+import { Category, Image, Item} from "@prisma/client";
 import AlertModal from "../modals/alert-modal";
 import Heading from "../ui/heading";
 import {
@@ -42,7 +42,6 @@ interface CreateItemFormProps {
       })
     | null;
   categories: Category[];
-  wardrobe: Wardrobe[];
 }
 
 export type ItemValues = z.infer<typeof itemSchema>;
@@ -50,7 +49,6 @@ export type ItemValues = z.infer<typeof itemSchema>;
 const CreateItemForm: React.FC<CreateItemFormProps> = ({
   initialData,
   categories,
-  wardrobe,
 }) => {
   const router = useRouter();
   const params = useParams();
@@ -77,7 +75,6 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
       categoryId: "",
       pattern: "",
       isFavorite: false,
-      forSale: false,
       isFeatured: false,
       isArchived: false,
       images: [],
@@ -129,6 +126,7 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
       setOpen(false);
     }
   };
+
 
   return (
     <>
@@ -342,34 +340,10 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
                       </FormDescription>
                       <FormMessage />
                     </div>
-
                   </FormItem>
                 )}
               />
-              <FormField
-                name="forSale"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        disabled={form.formState.isSubmitting}
-                        checked={field.value}
-                        // @ts-ignore
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel htmlFor="forSale">For Sale</FormLabel>
-                      <FormDescription>
-                        Mark this item as for sale
-                      </FormDescription>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-
+              
               <FormField
                 name="isFeatured"
                 control={form.control}

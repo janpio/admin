@@ -3,7 +3,6 @@ import CreateItemForm from "@/components/forms/create-item-form";
 
 import React from "react";
 import Container from "@/components/container";
-import { auth } from "@clerk/nextjs";
 
 const ItemPage = async ({
   params,
@@ -13,14 +12,6 @@ const ItemPage = async ({
     itemId: string;
   };
 }) => {
-    const {userId} = auth()
-
-    const wardrobe = await prisma.wardrobe.findMany({
-        where: {
-            userId: userId as string,
-        }
-    });
-
     const item = await prisma.item.findUnique({
         where: {
             id: params.itemId,
@@ -39,7 +30,6 @@ const ItemPage = async ({
     <Container>
         <section>
             <CreateItemForm 
-            wardrobe={wardrobe}
             initialData={item}
             categories={categories}
             />
