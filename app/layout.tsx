@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={mulish.className}>
+        <body className={`${mulish.className} `}>
           <ModalProvider />
           <main>{children}</main>
           <Toaster />

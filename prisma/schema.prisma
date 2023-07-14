@@ -25,23 +25,22 @@ model Wardrobe {
 model Item {
   id          String  @id @default(uuid())
   name        String
-  description String?
+  description String
   brand       String
-  sizeId      String
   pattern     String
   color       String
   categoryId  String
   isFeatured  Boolean @default(false)
   isArchived  Boolean @default(false)
+  isFavorite  Boolean @default(false)
   forSale     Boolean @default(false)
-
+  size        String
   wardrobeId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   images    Image[]
   wardrobe  Wardrobe    @relation("WardrobeItems", fields: [wardrobeId], references: [id], onDelete: Cascade)
-  size      Size        @relation("ItemSize", fields: [sizeId], references: [id], onDelete: Cascade)
   category  Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   outfits   Outfit[]    @relation("OutfitItems")
   favorites Favorite[]  @relation("FavoriteItems")
@@ -59,15 +58,6 @@ model Image {
   item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
-model Size {
-  id        String   @id @default(uuid())
-  name      String
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items Item[] @relation("ItemSize")
-}
 
 model Category {
   id   String @id @default(uuid())
@@ -84,10 +74,10 @@ model Category {
 model Outfit {
   id          String   @id @default(uuid())
   name        String
-  description String?
   season      String
   
   userId      String
+  outfitCreator String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

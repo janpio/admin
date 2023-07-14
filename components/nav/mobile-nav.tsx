@@ -31,8 +31,8 @@ const MobileNav = () => {
     },
     {
       name: "Clothes",
-      href: `/${params.wardrobeId}/clothes`,
-      active: pathname === `/${params.wardrobeId}/clothes`,
+      href: `/${params.wardrobeId}/items`,
+      active: pathname === `/${params.wardrobeId}/items`,
     },
     {
       name: "Orders",

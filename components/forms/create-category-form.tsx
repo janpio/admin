@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { Category, Wardrobe } from "@prisma/client";
+import { Category } from "@prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { categorySchema } from "@/lib/validation";
 import axios from "axios";
