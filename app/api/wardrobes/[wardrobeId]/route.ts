@@ -17,7 +17,6 @@ export async function GET(
             include: {
                 items: true,
                 categories: true,
-                orders: true,
             }
         });
 

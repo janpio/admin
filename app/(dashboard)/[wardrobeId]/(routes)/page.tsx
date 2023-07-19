@@ -40,13 +40,6 @@ const WardrobePage = async ({ params }: WardrobePageProps) => {
             />
             <CardStats
               items={0}
-              title="Orders"
-              description="Number of sales"
-              image="/icons/sales.png" 
-              link={`/${params.wardrobeId}/orders`}
-            />
-            <CardStats
-              items={0}
               title="Categories"
               description="Categories of items"
               image="/icons/category.png" 
@@ -61,8 +54,6 @@ const WardrobePage = async ({ params }: WardrobePageProps) => {
         <div className="col-span-1 flex flex-col gap-4">
           <ClientOnly>
             <Clock />
-            <Calendar />
-            <Coupons />
           </ClientOnly>
         </div>
       </div>

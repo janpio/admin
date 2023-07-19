@@ -53,7 +53,7 @@ const CellAction: React.FC<CellActionProps> = ({ data }) => {
   };
 
   const addToOutfit = () => {
-    router.push(`/${params.wardrobeId}/outfits/new?item=${data.id}`);
+    router.push(`/outfits/new?item=${data}`);
   };
 
   return (

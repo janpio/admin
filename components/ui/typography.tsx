@@ -1,5 +1,5 @@
 type TypographyProps = {
-    text: string;
+    text: string | number;
 }
 
 const Typography: React.FC<TypographyProps> = ({text}) => {

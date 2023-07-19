@@ -31,6 +31,7 @@ export const itemSchema = z
     color: z.string().nonempty({ message: "Color is required" }),
     size: z.string().nonempty({ message: "Size is required" }),
     brand: z.string().nonempty({ message: "Brand is required" }),
+    gender: z.string().nonempty({message: "Gender is required"}),
     pattern: z.string().nonempty({ message: "Pattern is required" }),
     isFavorite: z.boolean().default(false).optional(),
     isArchived: z.boolean().default(false).optional(),
@@ -55,3 +56,9 @@ export const itemSchema = z
     },
     { message: "An archived item cannot be featured, favorite, or for sale" }
   );
+
+
+export const outfitSchema = z.object({
+  name: z.string().min(1, { message: "Name must be at least 1 character long" }),
+  season: z.string().nonempty({ message: "Season is required" }),
+});

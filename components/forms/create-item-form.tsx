@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { itemSchema } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
-import { Category, Image, Item} from "@prisma/client";
+import { Category, Image, Item } from "@prisma/client";
 import AlertModal from "../modals/alert-modal";
 import Heading from "../ui/heading";
 import {
@@ -60,34 +60,39 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
   const title = initialData ? "Edit Item" : "Create Item";
   const desc = initialData ? "Edit your item" : "Create a new item";
   const buttonText = initialData ? "Edit Item" : "Create Item";
-  const toastMessage = initialData ? "Item updated successfully" : "Item created successfully";
+  const toastMessage = initialData
+    ? "Item updated successfully"
+    : "Item created successfully";
 
   const form = useForm<ItemValues>({
     resolver: zodResolver(itemSchema),
-    defaultValues: initialData ? {
-      ...initialData,
-    } : {
-      name: "",
-      brand: "",
-      size: "",
-      color: "",
-      description: "",
-      categoryId: "",
-      pattern: "",
-      isFavorite: false,
-      isFeatured: false,
-      isArchived: false,
-      images: [],
-    }
+    defaultValues: initialData
+      ? {
+          ...initialData,
+        }
+      : {
+          name: "",
+          brand: "",
+          size: "",
+          color: "",
+          description: "",
+          categoryId: "",
+          pattern: "",
+          isFavorite: false,
+          isFeatured: false,
+          isArchived: false,
+          images: [],
+          gender: "",
+        },
   });
 
   const onSubmit = async (values: ItemValues) => {
     try {
-      if(initialData) {
+      if (initialData) {
         await axios.patch(
           `/api/${params.wardrobeId}/items/${params.itemId}`,
           values
-        )
+        );
       } else {
         await axios.post(`/api/${params.wardrobeId}/items`, values);
       }
@@ -102,7 +107,7 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
         title: "Error",
         description: "Something went wrong",
         variant: "destructive",
-      })
+      });
     }
   };
 
@@ -126,7 +131,6 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
       setOpen(false);
     }
   };
-
 
   return (
     <>
@@ -317,9 +321,37 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
                   </FormItem>
                 )}
               />
+              <FormField
+                name="gender"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="gender">Gender</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="man">Man</SelectItem>
+                        <SelectItem value="woman">Woman</SelectItem>
+                        <SelectItem value="unisex">Unisex</SelectItem>
+                        <SelectItem value="kids">Kids</SelectItem>
+                        <SelectItem value="baby">Baby</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <FormField
                 name="isFavorite"
                 control={form.control}
@@ -343,7 +375,7 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 name="isFeatured"
                 control={form.control}
@@ -394,8 +426,9 @@ const CreateItemForm: React.FC<CreateItemFormProps> = ({
             </div>
             <div className="flex flex-row justify-end space-x-4">
               <Link
-              className="text-gray-500 hover:text-gray-600 hover:underline transition"
-              href={`/${params.wardrobeId}/items`}>
+                className="text-gray-500 hover:text-gray-600 hover:underline transition p-2"
+                href={`/${params.wardrobeId}/items`}
+              >
                 Cancel
               </Link>
               <Button type="submit" disabled={form.formState.isSubmitting}>

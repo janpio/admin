@@ -1,4 +1,12 @@
 "use client";
+import { Image, Outfit, Item } from "@prisma/client";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import axios from "axios";
+import { z } from "zod";
+import { outfitSchema } from "@/lib/validation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   Form,
   FormField,
@@ -9,336 +17,188 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
-  SelectTrigger,
   SelectContent,
-  SelectValue,
+  SelectTrigger,
   SelectItem,
+  SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import ImageUpload from "@/components/ui/image-upload";
-import { Category, Image, Item, Wardrobe } from "@prisma/client";
-import { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { ItemValues } from "./create-item-form";
+
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import AlertModal from "@/components/modals/alert-modal";
+import Heading from "@/components/ui/heading";
 
 interface FormProps {
-  onSubmit: SubmitHandler<ItemValues>;
-  categories: Category[];
-  wardrobe: Wardrobe[];
-  onDelete: () => void;
-  buttonText: string;
-  form: UseFormReturn<ItemValues>;
-  disabled?:
-    | (Item & {
-        images: Image[];
-      })
-    | null;
-  link: () => void;
+  items: (Item & {
+    images: Image[];
+  })[];
+  initialData: Outfit | null;
 }
 
-const CreateForm: React.FC<FormProps> = ({
-  onSubmit,
-  categories,
-  onDelete,
-  buttonText,
-  link,
-  disabled,
-  form,
-}) => {
-  const maxDescriptionLength = 1000;
+type OutfitValues = z.infer<typeof outfitSchema>;
+
+const CreateForm: React.FC<FormProps> = ({ initialData, items }) => {
+  const router = useRouter();
+  const params = useParams();
+  const { toast } = useToast();
+
+  const title = initialData ? "Edit Outfit" : "Create Outfit";
+  const description = initialData ? "Edit your outfit" : "Create a new outfit";
+  const buttonText = initialData ? "Edit Outfit" : "Create Outfit";
+  const toastTitle = initialData ? "Outfit Updated" : "Outfit Created";
+  const toastDescription = initialData
+    ? "Your outfit has been updated"
+    : "Your outfit has been created";
+
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const form = useForm({
+    resolver: zodResolver(outfitSchema),
+    defaultValues: {
+      name: initialData?.name || "",
+      season: initialData?.season || "",
+    },
+  });
+
+  const onSubmit = async (values: OutfitValues) => {
+    try {
+      if (initialData) {
+        await axios.patch(`/api/outfits/${initialData.id}`, values);
+      } else {
+        await axios.post(`/api/outfits`, values);
+      }
+
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+      });
+      router.refresh();
+      router.push(`/${params.wardrobeId}/outfits`);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onDelete = async () => {
+    try {
+      setLoading(true);
+      await axios.delete(`/api/outfits/${initialData?.id}`);
+      toast({
+        title: "Outfit Deleted",
+        description: "Your outfit has been deleted",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      router.push(`/${params.wardrobeId}/outfits`);
+      setOpen(false);
+    }
+  };
 
   return (
-    <Form {...form}>
-      <form className="space-y-8 my-8" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          name="images"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Images</FormLabel>
-              <FormControl>
-                <ImageUpload
-                  value={field.value.map(image => image.url)}
-                  disabled={form.formState.isSubmitting}
-                  onRemove={url =>
-                    field.onChange([
-                      ...field.value.filter(image => image.url !== url),
-                    ])
-                  }
-                  onChange={url => field.onChange([...field.value, { url }])}
-                />
-              </FormControl>
-              <FormDescription>
-                Upload images of your item. You can upload up to 5 images.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <>
+      <AlertModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        title="Delete Outfit"
+        description="Are you sure you want to delete this outfit? This action cannot be undone."
+        onConfirm={onDelete}
+        loading={loading}
+      />
+      
+      <Heading title={title} subtitle={description} />
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col space-y-8 mt-8"
+        >
           <FormField
+            control={form.control}
             name="name"
-            control={form.control}
-            render={({ field, formState }) => (
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel htmlFor="name">Name</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    disabled={formState.isSubmitting}
-                    placeholder="Enter the name of your item"
-                  />
+                  <Input {...field} placeholder="Enter outfit name" />
                 </FormControl>
+                <FormDescription>Give your outfit a name</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
           <FormField
-            name="brand"
             control={form.control}
-            render={({ field, formState }) => (
+            name="season"
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>Brand</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={formState.isSubmitting}
-                    placeholder="Enter the brand of your item"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="color"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem>
-                <FormLabel>Color</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={formState.isSubmitting}
-                    placeholder="Enter the color of your item"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="size"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem>
-                <FormLabel>Size</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={formState.isSubmitting}
-                    placeholder="Enter the size of your item"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormField
-          name="description"
-          control={form.control}
-          render={({ field, formState }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  disabled={formState.isSubmitting}
-                  placeholder="Enter the description of your item"
-                  maxLength={maxDescriptionLength}
-                  minLength={10}
-                />
-              </FormControl>
-              <FormDescription>
-                {field.value.length}/{maxDescriptionLength} characters
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <FormField
-            name="categoryId"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel htmlFor="season">Season</FormLabel>
                 <Select
-                  disabled={formState.isSubmitting}
                   onValueChange={field.onChange}
-                  value={field.value}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue
-                        placeholder="Select a category"
-                        defaultValue={field.value}
-                      />
+                      <SelectValue placeholder="Select Outfit Season" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="winter">Winter</SelectItem>
+                    <SelectItem value="spring">Spring</SelectItem>
+                    <SelectItem value="summer">Summer</SelectItem>
+                    <SelectItem value="fall">Fall</SelectItem>
                   </SelectContent>
                 </Select>
+                <FormDescription>
+                  What season is this outfit for?
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
-          <FormField
-            name="pattern"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem>
-                <FormLabel>Pattern</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={formState.isSubmitting}
-                    placeholder="Enter the pattern of your item"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <FormField
-            name="isFavorite"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    disabled={formState.isSubmitting}
-                    // @ts-ignore
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Favorite</FormLabel>
-                  <FormDescription>
-                    Mark this item as your favorite
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="forSale"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    disabled={formState.isSubmitting}
-                    // @ts-ignore
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Would Like to sell?</FormLabel>
-                  <FormDescription>Mark this item as for sale</FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="isFeatured"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    disabled={formState.isSubmitting}
-                    // @ts-ignore
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Featured</FormLabel>
-                  <FormDescription>
-                    Feature this item to be displayed on your profile
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="isArchived"
-            control={form.control}
-            render={({ field, formState }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    disabled={formState.isSubmitting}
-                    // @ts-ignore
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Archive</FormLabel>
-                  <FormDescription>
-                    Archive this item to be hidden from your profile
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="flex flex-row justify-end space-x-2">
-          <Button
-            onClick={link}
-            disabled={form.formState.isSubmitting}
-            variant={"link"}
-            type="button"
-          >
-            Cancel
-          </Button>
-          {disabled && (
+
+          <div className="w-full flex justify-end space-x-4">
             <Button
-              disabled={form.formState.isSubmitting}
-              variant="destructive"
-              onClick={onDelete}
-              type="button"
+            variant="link"
+            onClick={() => router.push(`/${params.wardrobeId}/outfits`)}
+            type="button"
+            >
+              Cancel
+            </Button>
+            {initialData && 
+            <Button
+            variant="destructive"
+            onClick={() => setOpen(true)}
+            type="button"
             >
               Delete
+            </Button>}
+            <Button
+            disabled={form.formState.isSubmitting}
+            type="submit"
+            >
+              {buttonText}
             </Button>
-          )}
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {buttonText}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          </div>
+        </form>
+      </Form>
+    </>
   );
 };
 

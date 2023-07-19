@@ -17,6 +17,11 @@ const Navbar = ({
       active: pathname === `/${params.wardrobeId}`,
     },
     {
+      name: "Categories",
+      href: `/${params.wardrobeId}/categories`,
+      active: pathname === `/${params.wardrobeId}/categories`,
+    },
+    {
       name: "Outfits",
       href: `/${params.wardrobeId}/outfits`,
       active: pathname === `/${params.wardrobeId}/outfits`,
@@ -25,11 +30,6 @@ const Navbar = ({
       name: "Clothes",
       href: `/${params.wardrobeId}/items`,
       active: pathname === `/${params.wardrobeId}/items`,
-    },
-    {
-      name: "Orders",
-      href: `/${params.wardrobeId}/orders`,
-      active: pathname === `/${params.wardrobeId}/orders`,
     },
     {
       name: "Settings",

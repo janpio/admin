@@ -39,7 +39,6 @@ const ItemsPage = async ({
     isArchived: item.isArchived,
     favorites: item.favorites.length,
     createdAt: format(new Date(item.createdAt), "MM/dd/yyyy"),
-    forSale: item.forSale,
     isFavorite: item.isFavorite,
   }))
 

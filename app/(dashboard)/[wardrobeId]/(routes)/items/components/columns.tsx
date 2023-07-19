@@ -18,7 +18,6 @@ export type ItemColumn = {
     url: string;
   }[];
   favorites: number;
-  forSale: boolean;
   isFavorite: boolean;
 };
 
@@ -78,10 +77,6 @@ export const columns: ColumnDef<ItemColumn>[] = [
   {
     accessorKey: "isArchived",
     header: "Archived",
-  },
-  {
-    accessorKey: "forSale",
-    header: "For Sale",
   },
   {
     accessorKey: "isFavorite",

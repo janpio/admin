@@ -28,6 +28,7 @@ model Item {
   brand       String
   pattern     String
   color       String
+  gender      String
   categoryId  String
   isFeatured  Boolean @default(false)
   isArchived  Boolean @default(false)
@@ -40,8 +41,9 @@ model Item {
   images    Image[]
   wardrobe  Wardrobe    @relation("WardrobeItems", fields: [wardrobeId], references: [id], onDelete: Cascade)
   category  Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  outfits   Outfit[]    @relation("OutfitItems")
+
   favorites Favorite[]  @relation("FavoriteItems")
+  outfits   OutfitItem[]
 }
 
 model Image {
@@ -71,17 +73,24 @@ model Outfit {
   id          String   @id @default(uuid())
   name        String
   season      String
-  
   userId      String
-  outfitCreator String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  items     Item[]     @relation("OutfitItems")
   favorites Favorite[] @relation("FavoriteOutfits")
   likes     Like[]
   comments  Comment[]
+  items     OutfitItem[]
 }
+
+model OutfitItem {
+  id      String @id @default(uuid())
+  outfit  Outfit @relation(fields: [outfitId], references: [id])
+  outfitId String
+  item    Item  @relation(fields: [itemId], references: [id])
+  itemId  String
+  createdAt DateTime @default(now())
+}
+
 
 model Favorite {
   id        String   @id @default(uuid())

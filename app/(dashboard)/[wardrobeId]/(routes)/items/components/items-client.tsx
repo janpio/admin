@@ -17,7 +17,7 @@ const ItemsClient: React.FC<ItemsClientProps> = ({ items }) => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between my-5">
+      <div className="flex flex-row items-center justify-between my-5">
         <Heading
           title={`Wardrobe Items (${items.length})`}
           subtitle="View all items in your wardrobe"
