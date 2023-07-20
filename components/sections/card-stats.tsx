@@ -22,11 +22,11 @@ const CardStats: React.FC<CardStatsProps> = ({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div 
-        className="flex items-center justify-center w-10 h-10 p-1 bg-muted  rounded-full">
+        className="flex items-center justify-center w-12 h-12 p-1 bg-muted  rounded-full">
           <Image
             src={image}
-            width={40}
-            height={40}
+            width={100}
+            height={100}
             alt={title}
             loading="lazy"
           />
@@ -37,7 +37,7 @@ const CardStats: React.FC<CardStatsProps> = ({
         <p className="text-xs text-muted-foreground">{description}</p>
       </CardContent>
       <CardFooter>
-        <Link href={link}>
+        <Link className="text-xs text-blue-500 hover:text-blue-600 transition-colors" href={link}>
           See more
         </Link>
       </CardFooter>

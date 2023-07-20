@@ -3,7 +3,20 @@ import prisma from "@/lib/prisma";
 export const getWardrobe = async (wardrobeId: string) => {
     const wardrobe = await prisma.wardrobe.findUnique({
         where: {
-            id: wardrobeId
+            id: wardrobeId,
+        },
+        include: {
+            items: {
+                include: {
+                    images: true,
+                    outfits: {
+                        include: {
+                            outfit: true,
+                        }
+                    }
+                }
+            },
+            categories: true,
         }
     }).catch((err) => {
         console.log(err)
@@ -11,14 +24,3 @@ export const getWardrobe = async (wardrobeId: string) => {
 
     return wardrobe;
 }
-
-/*include: {
-            items: {
-                take: 100,
-                include: {
-                    outfits: true,
-                }
-            },
-            categories: true,
-            orders: true,
-        } */

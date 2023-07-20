@@ -16,5 +16,6 @@ export type formattedOutfit = {
     season: string;
     likes: number;
     createdAt: string;
-    updatedAt?: string
+    updatedAt?: string;
+    items?: number;
 }

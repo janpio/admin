@@ -66,7 +66,7 @@ model Category {
   items     Item[]
 
   wardrobeId String
-  wardrobe   Wardrobe @relation("WardrobeCategories", fields: [wardrobeId], references: [id])
+  wardrobe   Wardrobe @relation("WardrobeCategories", fields: [wardrobeId], references: [id], onDelete: Cascade)
 }
 
 model Outfit {
@@ -84,10 +84,10 @@ model Outfit {
 
 model OutfitItem {
   id      String @id @default(uuid())
-  outfit  Outfit @relation(fields: [outfitId], references: [id])
+  outfit  Outfit @relation(fields: [outfitId], references: [id], onDelete: Cascade)
   outfitId String
-  item    Item  @relation(fields: [itemId], references: [id])
-  itemId  String
+  item    Item  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
   createdAt DateTime @default(now())
 }
 

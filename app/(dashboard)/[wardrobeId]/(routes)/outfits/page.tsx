@@ -11,6 +11,7 @@ const OutfitsPage = async ({ params }: { params: { wardrobeId: string } }) => {
   const outfits = await prisma.outfit.findMany({
     include: {
       likes: true,
+      items: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -24,6 +25,7 @@ const OutfitsPage = async ({ params }: { params: { wardrobeId: string } }) => {
     season: outfit.season,
     likes: outfit.likes.length,
     createdAt: format(new Date(outfit.createdAt), "MM/dd/yyyy"),
+    items: outfit.items.length
   }));
 
   return (

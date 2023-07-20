@@ -76,7 +76,7 @@ const SettingsForm = ({ initialData }: SettingsFormProps) => {
       router.push("/");
     } catch (error) {
       toast({
-        description: "Something went wrong.",
+        description: "You must delete all items and outfits in this wardrobe first.",
         variant: "destructive",
         action: (
           <ToastAction

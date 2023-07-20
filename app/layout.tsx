@@ -1,11 +1,12 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Mulish, Outfit } from "next/font/google";
+import { Mulish } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import ModalProvider from "@/providers/modal-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
-const outfit = Outfit({ subsets: ["latin"] });
+const outfit = Mulish({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -29,9 +30,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${outfit.className} `}>
-          <ModalProvider />
-          <main>{children}</main>
-          <Toaster />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ModalProvider />
+            <main>{children}</main>
+            <Toaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

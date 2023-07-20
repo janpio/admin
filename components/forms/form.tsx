@@ -181,14 +181,14 @@ const CreateForm: React.FC<FormProps> = ({ initialData, items }) => {
             >
               Cancel
             </Button>
-            {initialData && 
+            {/* {initialData && 
             <Button
             variant="destructive"
             onClick={() => setOpen(true)}
             type="button"
             >
               Delete
-            </Button>}
+            </Button>} */}
             <Button
             disabled={form.formState.isSubmitting}
             type="submit"

@@ -38,6 +38,7 @@ const OutfitClient: React.FC<OutfitClientProps> = ({ outfits }) => {
             likes={outfit.likes}
             season={outfit.season}
             id={outfit.id}
+            items={outfit?.items || 0}
           />
         ))}
       </ul>
