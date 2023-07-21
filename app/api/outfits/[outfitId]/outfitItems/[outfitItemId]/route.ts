@@ -34,61 +34,46 @@ export async function PATCH(
   req: Request,
   { params }: { params: { outfitId: string; outfitItemId: string} }
 ) {
-  const { outfitItemId } = params;
+  const { outfitItemId, outfitId } = params;
   const { userId } = auth();
   const body = await req.json();
 
   if (!userId)
     return new NextResponse("Authentication is required", { status: 401 });
 
-  try {
-    const outfitItem = await prisma.outfitItem.update({
-      where: {
-        id: outfitItemId,
-      },
-      data: {
-        outfit: {
-          connect: {
-            id: body.outfitId,
-          },
+    try {
+      const outfitItem = await prisma.outfitItem.findMany({
+        where: {
+          outfitId: outfitId,
+        }
+      });
+  
+      //iterate through outfitItems and remove from the array the one that matches the outfitItemId
+      const filteredOutfitItems = outfitItem.filter((item) => item.id !== outfitItemId);
+  
+      //update the outfit with the new array of outfitItems
+      const updatedOutfit = await prisma.outfit.update({
+        where: {
+          id: outfitId,
         },
-        item: {
-          connect: {
-            id: body.itemId,
-          },
-        },
-      },
-    });
-
-    return NextResponse.json(outfitItem);
-  } catch (error) {
-    console.log("Error updating outfit item: ", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
+        data: {
+          items: {
+            set: filteredOutfitItems,
+          }
+        }
+      });
+  
+      return NextResponse.json(updatedOutfit);
+      
+    } catch (error) {
+      console.log("Error updating outfit item: ", error);
+      return new NextResponse("Internal Server Error", { status: 500 });
+    }
 }
 
 export async function DELETE(
   req: Request,
   { params }: { params: { outfitId: string; outfitItemId: string} }
 ) {
-  const { outfitItemId, outfitId } = params;
-  const { userId } = auth();
-
-  if (!userId)
-    return new NextResponse("Authentication is required", { status: 401 });
-
-  try {
-    //remove outfititem from outfit
-    const outfitItem = await prisma.outfitItem.delete({
-      where: {
-        id: outfitItemId,
-        outfitId: outfitId,
-      },
-    });
-
-    return NextResponse.json(outfitItem);
-  } catch (error) {
-    console.log("Error deleting outfit item: ", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
+  return new NextResponse("Not implemented", { status: 501 });
 }
